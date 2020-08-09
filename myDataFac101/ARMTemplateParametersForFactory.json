@@ -1,0 +1,78 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "myDataFac101"
+		},
+		"AWS3Bucket_secretAccessKey": {
+			"value": ""
+		},
+		"AzureBlobStorage1_connectionString": {
+			"value": ""
+		},
+		"AzureBlobStorage2_connectionString": {
+			"value": ""
+		},
+		"AzureDataLakeStorage1_accountKey": {
+			"value": ""
+		},
+		"AzureSynapseAnalytics1_connectionString": {
+			"value": ""
+		},
+		"AzureSynapseDWH_connectionString": {
+			"value": ""
+		},
+		"HDInsBlobLinkedService_accountKey": {
+			"value": ""
+		},
+		"HDInsightLinkedService_password": {
+			"value": ""
+		},
+		"MyAzureDatabricksLinkedService_accessToken": {
+			"value": ""
+		},
+		"MyLocalFileSystem_password": {
+			"value": ""
+		},
+		"OutputDatabase_connectionString": {
+			"value": ""
+		},
+		"SqlServer1_connectionString": {
+			"value": ""
+		},
+		"ADLSGen2LinkedServKeyVault_properties_typeProperties_url": {
+			"value": "https://mydatalake101.dfs.core.windows.net"
+		},
+		"ADLSGen2LinkedServManIdentity_properties_typeProperties_url": {
+			"value": "https://mydatalake101.dfs.core.windows.net"
+		},
+		"AWS3Bucket_properties_typeProperties_accessKeyId": {
+			"value": "AKIA3VRETKWW3KJRGOER"
+		},
+		"AzureDataLakeStorage1_properties_typeProperties_url": {
+			"value": "https://mydatalake101.dfs.core.windows.net"
+		},
+		"GetRestServiceOnCovid_properties_typeProperties_url": {
+			"value": "https://api.covid19india.org/raw_data8.json"
+		},
+		"HDInsBlobLinkedService_properties_typeProperties_url": {
+			"value": "https://mystoragehadoop.dfs.core.windows.net"
+		},
+		"HDInsightLinkedService_properties_typeProperties_userName": {
+			"value": "admin101"
+		},
+		"MyADFKeyVaultLinkedService_properties_typeProperties_baseUrl": {
+			"value": "https://myAZKeyVault101.vault.azure.net/"
+		},
+		"MyLocalFileSystem_properties_typeProperties_host": {
+			"value": "C:\\Azure Datalake\\Output\\SQLServer"
+		},
+		"MyLocalFileSystem_properties_typeProperties_userId": {
+			"value": "Satan Romeo"
+		},
+		"newEventBlob_properties_typeProperties_scope": {
+			"value": "/subscriptions/93e60db3-e785-4da9-8ae9-e73236b89bcf/resourceGroups/MyBasicResourceGroup/providers/Microsoft.Storage/storageAccounts/mydatalake101"
+		}
+	}
+}
