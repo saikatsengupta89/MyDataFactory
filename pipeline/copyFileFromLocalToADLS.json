@@ -26,9 +26,14 @@
 						}
 					},
 					"sink": {
-						"type": "ParquetSink",
+						"type": "DelimitedTextSink",
 						"storeSettings": {
 							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".csv"
 						}
 					},
 					"enableStaging": false,
@@ -49,7 +54,7 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "MigDataLakeSTGFolder",
+						"referenceName": "ADLSLocal",
 						"type": "DatasetReference"
 					}
 				]
