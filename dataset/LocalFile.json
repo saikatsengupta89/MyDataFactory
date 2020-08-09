@@ -1,0 +1,52 @@
+{
+	"name": "LocalFile",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "MyLocalFileSystem",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "FileServerLocation",
+				"fileName": "FactProductInventory.txt"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "ProductKey",
+				"type": "String"
+			},
+			{
+				"name": "DateKey",
+				"type": "String"
+			},
+			{
+				"name": "MovementDate",
+				"type": "String"
+			},
+			{
+				"name": "UnitCost",
+				"type": "String"
+			},
+			{
+				"name": "UnitsIn",
+				"type": "String"
+			},
+			{
+				"name": "UnitsOut",
+				"type": "String"
+			},
+			{
+				"name": "UnitsBalance",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

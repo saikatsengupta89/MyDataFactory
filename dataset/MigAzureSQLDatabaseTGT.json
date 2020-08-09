@@ -1,0 +1,32 @@
+{
+	"name": "MigAzureSQLDatabaseTGT",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "OutputDatabase",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"TableName": {
+				"type": "string",
+				"defaultValue": "dbo.DimCurrency"
+			}
+		},
+		"folder": {
+			"name": "OnPremiseDBMigration"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": {
+				"value": "@substring(dataset().TableName, 0,3)",
+				"type": "Expression"
+			},
+			"table": {
+				"value": "@substring(dataset().TableName, 4, sub(length(dataset().TableName), 4))",
+				"type": "Expression"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

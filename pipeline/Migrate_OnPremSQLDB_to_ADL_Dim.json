@@ -1,0 +1,205 @@
+{
+	"name": "Migrate_OnPremSQLDB_to_ADL_Dim",
+	"properties": {
+		"description": "Migrate Dimensions from on-premise database to ADLS",
+		"activities": [
+			{
+				"name": "ForEach_mt6",
+				"type": "ForEach",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@pipeline().parameters.cw_items",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Copy_mt6",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [
+								{
+									"name": "Source",
+									"value": "dbo.@{item().source.table}"
+								},
+								{
+									"name": "Destination",
+									"value": "mytarget101/dimensions/@{item().destination.fileName}"
+								}
+							],
+							"typeProperties": {
+								"source": {
+									"type": "SqlServerSource",
+									"partitionOption": "None"
+								},
+								"sink": {
+									"type": "ParquetSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									}
+								},
+								"enableStaging": false
+							},
+							"inputs": [
+								{
+									"referenceName": "SQLServerOnPremDB",
+									"type": "DatasetReference",
+									"parameters": {
+										"cw_table": "@item().source.table"
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "DestinationMigrated_ParquetDim",
+									"type": "DatasetReference",
+									"parameters": {
+										"cw_fileName": "@item().destination.fileName"
+									}
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"cw_items": {
+				"type": "Array",
+				"defaultValue": [
+					{
+						"source": {
+							"table": "DimAccount"
+						},
+						"destination": {
+							"fileName": "dim_account.parquet"
+						}
+					},
+					{
+						"source": {
+							"table": "DimCurrency"
+						},
+						"destination": {
+							"fileName": "dim_currency.parquet"
+						}
+					},
+					{
+						"source": {
+							"table": "DimCustomer"
+						},
+						"destination": {
+							"fileName": "dim_customer.parquet"
+						}
+					},
+					{
+						"source": {
+							"table": "DimDate"
+						},
+						"destination": {
+							"fileName": "dim_date.parquet"
+						}
+					},
+					{
+						"source": {
+							"table": "DimDepartmentGroup"
+						},
+						"destination": {
+							"fileName": "dim_department_group.parquet"
+						}
+					},
+					{
+						"source": {
+							"table": "DimEmployee"
+						},
+						"destination": {
+							"fileName": "dim_employee.parquet"
+						}
+					},
+					{
+						"source": {
+							"table": "DimGeography"
+						},
+						"destination": {
+							"fileName": "dim_geography.parquet"
+						}
+					},
+					{
+						"source": {
+							"table": "DimOrganization"
+						},
+						"destination": {
+							"fileName": "dim_organization.parquet"
+						}
+					},
+					{
+						"source": {
+							"table": "DimProduct"
+						},
+						"destination": {
+							"fileName": "dim_product.parquet"
+						}
+					},
+					{
+						"source": {
+							"table": "DimProductCategory"
+						},
+						"destination": {
+							"fileName": "dim_product_category.parquet"
+						}
+					},
+					{
+						"source": {
+							"table": "DimProductSubcategory"
+						},
+						"destination": {
+							"fileName": "dim_product_subcategory.parquet"
+						}
+					},
+					{
+						"source": {
+							"table": "DimPromotion"
+						},
+						"destination": {
+							"fileName": "dim_promotion.parquet"
+						}
+					},
+					{
+						"source": {
+							"table": "DimReseller"
+						},
+						"destination": {
+							"fileName": "dim_reseller.parquet"
+						}
+					},
+					{
+						"source": {
+							"table": "DimSalesReason"
+						},
+						"destination": {
+							"fileName": "dim_sales_reason.parquet"
+						}
+					},
+					{
+						"source": {
+							"table": "DimSalesTerritory"
+						},
+						"destination": {
+							"fileName": "dim_sales_territory.parquet"
+						}
+					}
+				]
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2020-06-23T15:44:10Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

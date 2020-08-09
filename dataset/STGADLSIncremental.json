@@ -1,0 +1,28 @@
+{
+	"name": "STGADLSIncremental",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataLakeStorage1",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "ProcessingIncrSQLDWH"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "raw.parquet",
+					"type": "Expression"
+				},
+				"folderPath": "incremental/FactInternetSales",
+				"fileSystem": "mystaging101"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

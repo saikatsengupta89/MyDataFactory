@@ -1,0 +1,26 @@
+{
+	"name": "LKPLoadPath",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "OutputDatabase",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "tableName",
+				"type": "varchar"
+			},
+			{
+				"name": "fileName",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "DataLoadLKP"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

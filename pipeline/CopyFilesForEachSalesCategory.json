@@ -1,0 +1,198 @@
+{
+	"name": "CopyFilesForEachSalesCategory",
+	"properties": {
+		"activities": [
+			{
+				"name": "LKPCategory",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlServerSource",
+						"sqlReaderStoredProcedureName": "[demo].[GetProductCategories]",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "SqlServerLKPCategory",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "ForEachCategory",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "LKPCategory",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('LKPCategory').output.value",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "CopySalesFromOnPremToADLS",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "SqlServerSource",
+									"sqlReaderStoredProcedureName": "[demo].[GetSales]",
+									"storedProcedureParameters": {
+										"ProductCategory": {
+											"type": "String",
+											"value": {
+												"value": "@item().Category",
+												"type": "Expression"
+											}
+										}
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"sink": {
+									"type": "DelimitedTextSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "DelimitedTextWriteSettings",
+										"quoteAllText": true,
+										"fileExtension": ".txt"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"mappings": [
+										{
+											"source": {
+												"name": "OrderDate",
+												"type": "DateTime",
+												"physicalType": "datetime"
+											},
+											"sink": {
+												"type": "DateTime",
+												"ordinal": 1
+											}
+										},
+										{
+											"source": {
+												"name": "SalesOrderNumber",
+												"type": "String",
+												"physicalType": "nvarchar"
+											},
+											"sink": {
+												"type": "String",
+												"ordinal": 2
+											}
+										},
+										{
+											"source": {
+												"name": "MaxSalesAmount",
+												"type": "Decimal",
+												"physicalType": "money"
+											},
+											"sink": {
+												"type": "Decimal",
+												"ordinal": 3
+											}
+										}
+									],
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "SqlServerSalesData",
+									"type": "DatasetReference"
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ADLSales",
+									"type": "DatasetReference"
+								}
+							]
+						},
+						{
+							"name": "ProcUpdateDetails",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "CopySalesFromOnPremToADLS",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[demo].[UpdateProcessDetails]",
+								"storedProcedureParameters": {
+									"Duration": {
+										"value": {
+											"value": "@activity('CopySalesFromOnPremToADLS').output.copyDuration",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									},
+									"ProductCategory": {
+										"value": {
+											"value": "@item().Category",
+											"type": "Expression"
+										},
+										"type": "String"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "SqlServer1",
+								"type": "LinkedServiceReference"
+							}
+						}
+					]
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2020-07-01T13:22:02Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

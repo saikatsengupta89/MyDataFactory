@@ -1,0 +1,298 @@
+{
+	"name": "GetCovidAPIData",
+	"properties": {
+		"activities": [
+			{
+				"name": "GetAPIData",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "RestSource",
+						"httpRequestTimeout": "00:01:40",
+						"requestInterval": "00.00:00:00.010",
+						"requestMethod": "GET"
+					},
+					"sink": {
+						"type": "JsonSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "JsonWriteSettings",
+							"quoteAllText": true,
+							"filePattern": "setOfObjects"
+						}
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "DatasetCovid",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DatasetCovidJson",
+						"type": "DatasetReference"
+					}
+				]
+			},
+			{
+				"name": "TransformJSON",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "GetAPIData",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "JsonSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true
+						},
+						"formatSettings": {
+							"type": "JsonReadSettings"
+						}
+					},
+					"sink": {
+						"type": "DelimitedTextSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings",
+							"copyBehavior": "FlattenHierarchy"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".txt"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"path": "$['raw_data'][0]['agebracket']"
+								},
+								"sink": {
+									"type": "String",
+									"ordinal": 1
+								}
+							},
+							{
+								"source": {
+									"path": "$['raw_data'][0]['contractedfromwhichpatientsuspected']"
+								},
+								"sink": {
+									"type": "String",
+									"ordinal": 2
+								}
+							},
+							{
+								"source": {
+									"path": "$['raw_data'][0]['currentstatus']"
+								},
+								"sink": {
+									"type": "String",
+									"ordinal": 3
+								}
+							},
+							{
+								"source": {
+									"path": "$['raw_data'][0]['dateannounced']"
+								},
+								"sink": {
+									"type": "String",
+									"ordinal": 4
+								}
+							},
+							{
+								"source": {
+									"path": "$['raw_data'][0]['detectedcity']"
+								},
+								"sink": {
+									"type": "String",
+									"ordinal": 5
+								}
+							},
+							{
+								"source": {
+									"path": "$['raw_data'][0]['detecteddistrict']"
+								},
+								"sink": {
+									"type": "String",
+									"ordinal": 6
+								}
+							},
+							{
+								"source": {
+									"path": "$['raw_data'][0]['detectedstate']"
+								},
+								"sink": {
+									"type": "String",
+									"ordinal": 7
+								}
+							},
+							{
+								"source": {
+									"path": "$['raw_data'][0]['entryid']"
+								},
+								"sink": {
+									"type": "String",
+									"ordinal": 8
+								}
+							},
+							{
+								"source": {
+									"path": "$['raw_data'][0]['gender']"
+								},
+								"sink": {
+									"type": "String",
+									"ordinal": 9
+								}
+							},
+							{
+								"source": {
+									"path": "$['raw_data'][0]['nationality']"
+								},
+								"sink": {
+									"type": "String",
+									"ordinal": 10
+								}
+							},
+							{
+								"source": {
+									"path": "$['raw_data'][0]['notes']"
+								},
+								"sink": {
+									"type": "String",
+									"ordinal": 11
+								}
+							},
+							{
+								"source": {
+									"path": "$['raw_data'][0]['numcases']"
+								},
+								"sink": {
+									"type": "String",
+									"ordinal": 12
+								}
+							},
+							{
+								"source": {
+									"path": "$['raw_data'][0]['patientnumber']"
+								},
+								"sink": {
+									"type": "String",
+									"ordinal": 13
+								}
+							},
+							{
+								"source": {
+									"path": "$['raw_data'][0]['source1']"
+								},
+								"sink": {
+									"type": "String",
+									"ordinal": 14
+								}
+							},
+							{
+								"source": {
+									"path": "$['raw_data'][0]['source2']"
+								},
+								"sink": {
+									"type": "String",
+									"ordinal": 15
+								}
+							},
+							{
+								"source": {
+									"path": "$['raw_data'][0]['source3']"
+								},
+								"sink": {
+									"type": "String",
+									"ordinal": 16
+								}
+							},
+							{
+								"source": {
+									"path": "$['raw_data'][0]['statecode']"
+								},
+								"sink": {
+									"type": "String",
+									"ordinal": 17
+								}
+							},
+							{
+								"source": {
+									"path": "$['raw_data'][0]['statepatientnumber']"
+								},
+								"sink": {
+									"type": "String",
+									"ordinal": 18
+								}
+							},
+							{
+								"source": {
+									"path": "$['raw_data'][0]['statuschangedate']"
+								},
+								"sink": {
+									"type": "String",
+									"ordinal": 19
+								}
+							},
+							{
+								"source": {
+									"path": "$['raw_data'][0]['typeoftransmission']"
+								},
+								"sink": {
+									"type": "String",
+									"ordinal": 20
+								}
+							}
+						],
+						"collectionReference": ""
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "DatasetCovidJson",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DatasetCovidStructured",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2020-07-20T20:00:22Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

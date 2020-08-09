@@ -1,0 +1,31 @@
+{
+	"name": "AzureSQLDWH",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSynapseDWH",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"TableName": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "ProcessingSQLDWH"
+		},
+		"annotations": [],
+		"type": "AzureSqlDWTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": {
+				"value": "@substring(dataset().TableName, 0,3)",
+				"type": "Expression"
+			},
+			"table": {
+				"value": "@substring(dataset().TableName, 4, sub(length(dataset().TableName),4))",
+				"type": "Expression"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

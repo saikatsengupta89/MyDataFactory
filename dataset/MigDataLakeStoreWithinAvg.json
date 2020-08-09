@@ -1,0 +1,38 @@
+{
+	"name": "MigDataLakeStoreWithinAvg",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataLakeStorage1",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"TableSchema": {
+				"type": "string",
+				"defaultValue": "dummy"
+			},
+			"TableName": {
+				"type": "string",
+				"defaultValue": "dummy"
+			}
+		},
+		"folder": {
+			"name": "OnPremiseDBMigration"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@{concat(dataset().TableSchema,'.',dataset().TableName)}/@{concat(dataset().TableName,'_', formatDateTime(utcnow(),'yyyyMMdd'),'.parquet')}",
+					"type": "Expression"
+				},
+				"folderPath": "stg_migADWorks",
+				"fileSystem": "mystaging101"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

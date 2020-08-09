@@ -1,0 +1,43 @@
+{
+	"name": "MasterPipelineSales",
+	"properties": {
+		"activities": [
+			{
+				"name": "OnPremtoADLS",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "MigrateOnPremtoDataLakeGen2",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "ADLSToSQLDB",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "OnPremtoADLS",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "MigrateDataLakeGen2toAzureSQLDB",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2020-07-22T12:08:01Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

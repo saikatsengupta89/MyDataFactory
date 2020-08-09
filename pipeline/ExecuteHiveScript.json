@@ -1,0 +1,34 @@
+{
+	"name": "ExecuteHiveScript",
+	"properties": {
+		"activities": [
+			{
+				"name": "HiveScript",
+				"type": "HDInsightHive",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"scriptPath": "filesystemhive/myhivescripts/hiveScript.hql",
+					"scriptLinkedService": {
+						"referenceName": "HDInsBlobLinkedService",
+						"type": "LinkedServiceReference"
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "HDInsightLinkedService",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2020-07-19T12:30:39Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

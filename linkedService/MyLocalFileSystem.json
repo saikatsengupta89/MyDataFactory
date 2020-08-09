@@ -1,0 +1,17 @@
+{
+	"name": "MyLocalFileSystem",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "FileServer",
+		"typeProperties": {
+			"host": "C:\\Azure Datalake\\Output\\SQLServer",
+			"userId": "Satan Romeo",
+			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiI5YmQ1Y2Y0YS1iYTY5LTQxZWYtYjNiNy0yZjk4OGJkNWU2OTAiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
+		},
+		"connectVia": {
+			"referenceName": "integrationRuntimeSelfHosted",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

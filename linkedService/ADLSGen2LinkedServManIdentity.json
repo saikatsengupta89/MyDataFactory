@@ -1,0 +1,11 @@
+{
+	"name": "ADLSGen2LinkedServManIdentity",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "AzureBlobFS",
+		"typeProperties": {
+			"url": "https://mydatalake101.dfs.core.windows.net"
+		}
+	}
+}

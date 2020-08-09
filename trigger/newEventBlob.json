@@ -1,0 +1,26 @@
+{
+	"name": "newEventBlob",
+	"properties": {
+		"description": "This is an event based trigger",
+		"annotations": [],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "ProcessDataEventBased",
+					"type": "PipelineReference"
+				}
+			}
+		],
+		"type": "BlobEventsTrigger",
+		"typeProperties": {
+			"blobPathBeginsWith": "/mystaging101/blobs/",
+			"blobPathEndsWith": "stg_eventbased/completed.txt",
+			"ignoreEmptyBlobs": false,
+			"scope": "/subscriptions/93e60db3-e785-4da9-8ae9-e73236b89bcf/resourceGroups/MyBasicResourceGroup/providers/Microsoft.Storage/storageAccounts/mydatalake101",
+			"events": [
+				"Microsoft.Storage.BlobCreated"
+			]
+		}
+	}
+}

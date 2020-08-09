@@ -1,0 +1,29 @@
+{
+	"name": "LKPTablesForSynapse",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "OutputDatabase",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "ProcessingSQLDWH"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "TableName",
+				"type": "varchar"
+			},
+			{
+				"name": "LoadType",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "RefLookupSQLDWTableMig"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

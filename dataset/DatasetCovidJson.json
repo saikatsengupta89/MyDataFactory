@@ -1,0 +1,93 @@
+{
+	"name": "DatasetCovidJson",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataLakeStorage1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "data.json",
+				"folderPath": "dumpCovidData",
+				"fileSystem": "mystaging101"
+			}
+		},
+		"schema": {
+			"type": "object",
+			"properties": {
+				"raw_data": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"agebracket": {
+								"type": "string"
+							},
+							"contractedfromwhichpatientsuspected": {
+								"type": "string"
+							},
+							"currentstatus": {
+								"type": "string"
+							},
+							"dateannounced": {
+								"type": "string"
+							},
+							"detectedcity": {
+								"type": "string"
+							},
+							"detecteddistrict": {
+								"type": "string"
+							},
+							"detectedstate": {
+								"type": "string"
+							},
+							"entryid": {
+								"type": "string"
+							},
+							"gender": {
+								"type": "string"
+							},
+							"nationality": {
+								"type": "string"
+							},
+							"notes": {
+								"type": "string"
+							},
+							"numcases": {
+								"type": "string"
+							},
+							"patientnumber": {
+								"type": "string"
+							},
+							"source1": {
+								"type": "string"
+							},
+							"source2": {
+								"type": "string"
+							},
+							"source3": {
+								"type": "string"
+							},
+							"statecode": {
+								"type": "string"
+							},
+							"statepatientnumber": {
+								"type": "string"
+							},
+							"statuschangedate": {
+								"type": "string"
+							},
+							"typeoftransmission": {
+								"type": "string"
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

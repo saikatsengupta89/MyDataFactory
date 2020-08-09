@@ -1,0 +1,31 @@
+{
+	"name": "ADLSIncremental_SalesData",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataLakeStorage1",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"month_key": {
+				"type": "string",
+				"defaultValue": "201912"
+			}
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@concat('fact_internet_sales_',dataset().month_key,'.parquet')",
+					"type": "Expression"
+				},
+				"folderPath": "facts/fact_internet_sales",
+				"fileSystem": "mytarget101"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

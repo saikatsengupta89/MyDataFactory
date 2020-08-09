@@ -1,0 +1,225 @@
+{
+	"name": "ProcessDailySalesAgg",
+	"properties": {
+		"activities": [
+			{
+				"name": "PassRefreshMonth",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "month_key",
+					"value": {
+						"value": "@if(equals(formatDateTime(utcnow(),'yyyyMM'), formatDateTime(adddays(utcnow(), -1),'yyyyMM')), formatDateTime(utcnow(),'yyyyMM'), formatDateTime(adddays(utcnow(), -1),'yyyyMM'))",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "MoveMonthlySalesDataFromOnPremToDataLake",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "PassRefreshMonth",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [
+					{
+						"name": "Source",
+						"value": "dbo.FactInternetSales"
+					},
+					{
+						"name": "Destination",
+						"value": "mytarget101/facts/fact_internet_sales/@{concat('fact_internet_sales_',variables('month_key'),'.parquet')}"
+					}
+				],
+				"typeProperties": {
+					"source": {
+						"type": "SqlServerSource",
+						"sqlReaderQuery": {
+							"value": "@concat('select * from FactInternetSales where cast(SUBSTRING(cast(OrderDateKey as varchar),1, 6) as int) =', variables('month_key'))",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "SqlServerSalesData",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ADLSIncremental_SalesData",
+						"type": "DatasetReference",
+						"parameters": {
+							"month_key": {
+								"value": "@variables('month_key')",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			},
+			{
+				"name": "ProcessMonthlySalesAgg",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "MoveMonthlySalesDataFromOnPremToDataLake",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Users/saikat.sengupta89.learn_gmail.com#ext#@saikatsengupta89learngmail.onmicrosoft.com/ProcessSalesAggMthly",
+					"baseParameters": {
+						"month_key": {
+							"value": "@variables('month_key')",
+							"type": "Expression"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "MyAzureDatabricksLinkedService",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "LoadAuditTableOnSuccess",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "ProcessMonthlySalesAgg",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[LoadAuditSalesAggMthly]",
+					"storedProcedureParameters": {
+						"message": {
+							"value": {
+								"value": "@activity('ProcessMonthlySalesAgg').output.runOutput",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"month_key": {
+							"value": {
+								"value": "@variables('month_key')",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "SqlServer1",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "LoadAuditTableOnFailure",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "ProcessMonthlySalesAgg",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[LoadAuditSalesAggMthly]",
+					"storedProcedureParameters": {
+						"message": {
+							"value": {
+								"value": "@activity('ProcessMonthlySalesAgg').output.runOutput",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"month_key": {
+							"value": {
+								"value": "@variables('month_key')",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "SqlServer1",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"variables": {
+			"month_key": {
+				"type": "String",
+				"defaultValue": "201912"
+			},
+			"pipelineName": {
+				"type": "String",
+				"defaultValue": "Sales01 - Daily Incremental Sales"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2020-07-21T16:58:30Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

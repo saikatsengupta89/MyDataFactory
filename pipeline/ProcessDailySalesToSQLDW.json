@@ -1,0 +1,216 @@
+{
+	"name": "ProcessDailySalesToSQLDW",
+	"properties": {
+		"activities": [
+			{
+				"name": "PassRefreshMonth",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "MONTH_KEY",
+					"value": {
+						"value": "@if(equals(formatDateTime(utcnow(),'yyyyMM'), formatDateTime(adddays(utcnow(), -1),'yyyyMM')), formatDateTime(utcnow(),'yyyyMM'), formatDateTime(adddays(utcnow(), -1),'yyyyMM'))",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "MoveSalesDataToDataLakeStage",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "PassRefreshMonth",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlServerSource",
+						"sqlReaderQuery": {
+							"value": "@concat('select * from FactInternetSales where cast(SUBSTRING(cast(OrderDateKey as varchar),1, 6) as int) =', variables('MONTH_KEY'))",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "SqlServerSalesData",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "STGADLSIncremental",
+						"type": "DatasetReference"
+					}
+				]
+			},
+			{
+				"name": "MoveFromADLSToSQLDW",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "MoveSalesDataToDataLakeStage",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "ParquetSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true
+						}
+					},
+					"sink": {
+						"type": "SqlDWSink",
+						"preCopyScript": {
+							"value": "@{concat('DELETE FROM FactInternetSales where cast(SUBSTRING(cast(OrderDateKey as varchar),1, 6) as int) =', variables('MONTH_KEY'))}",
+							"type": "Expression"
+						},
+						"disableMetricsCollection": false
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "STGADLSIncremental",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "AzureSQLDWH",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": {
+								"value": "@variables('TABLE_NAME')",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			},
+			{
+				"name": "DeleteAggBeforeLoad",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "MoveFromADLSToSQLDW",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[DeleteFromSalesAgg]",
+					"storedProcedureParameters": {
+						"MonthKey": {
+							"value": {
+								"value": "@variables('MONTH_KEY')",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseDWH",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "LoadTransformedAgg",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "DeleteAggBeforeLoad",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Users/saikat.sengupta89.learn_gmail.com#ext#@saikatsengupta89learngmail.onmicrosoft.com/ProcessDailyAggIntoSQLDW",
+					"baseParameters": {
+						"MONTH_KEY": {
+							"value": "@variables('MONTH_KEY')",
+							"type": "Expression"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "MyAzureDatabricksLinkedService",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"variables": {
+			"MONTH_KEY": {
+				"type": "String",
+				"defaultValue": "202006"
+			},
+			"TABLE_NAME": {
+				"type": "String",
+				"defaultValue": "dbo.FactInternetSales"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2020-07-10T23:35:15Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
