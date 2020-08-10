@@ -1,0 +1,83 @@
+{
+	"name": "TestActivity",
+	"properties": {
+		"activities": [
+			{
+				"name": "LKPTables",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "SetLoadDateTime",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "select * from dbo.RefLookupSQLDWTableMig where LoadType='Copy'",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "LKPTablesForSynapse",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "SetLoadDateTime",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "ProcessDate",
+					"value": {
+						"value": "@formatDateTime(utcnow(), 'yyyyMMddhhmmss')",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "ForEach1",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "LKPTables",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('LKPTables').output.values",
+						"type": "Expression"
+					},
+					"batchCount": 5
+				}
+			}
+		],
+		"variables": {
+			"ProcessDate": {
+				"type": "String",
+				"defaultValue": "20191231"
+			}
+		},
+		"annotations": []
+	}
+}
