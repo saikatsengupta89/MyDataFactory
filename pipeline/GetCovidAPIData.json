@@ -28,7 +28,6 @@
 						},
 						"formatSettings": {
 							"type": "JsonWriteSettings",
-							"quoteAllText": true,
 							"filePattern": "setOfObjects"
 						}
 					},
